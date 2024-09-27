@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-export default function HistoryLayout () {
+export default function ColectionLayout () {
     return (
         <Stack>
             <Stack.Screen name="index" options={{

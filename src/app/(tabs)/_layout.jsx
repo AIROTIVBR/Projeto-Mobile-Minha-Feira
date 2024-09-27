@@ -13,10 +13,18 @@ export default function TabsLayout() {
                 }}
             />
             <Tabs.Screen
-                name="History"
+                name="Colection"
                 options={{
-                title: 'History',
-                tabBarIcon: ({ color }) => <Feather name="clock" size={24} color={color} />,
+                title: 'Colection',
+                tabBarIcon: ({ color }) => <Feather name="bookmark" size={24} color={color} />,
+                headerShown: false
+                }}
+            />
+            <Tabs.Screen
+                name="NewList"
+                options={{
+                title: 'NewList',
+                tabBarIcon: ({ color }) => <Feather name="file-plus" size={24} color={color} />,
                 headerShown: false
                 }}
             />

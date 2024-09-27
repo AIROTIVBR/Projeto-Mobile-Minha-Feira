@@ -1,11 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { Link } from 'expo-router';
 
-export default function History() {
+export default function Colection() {
   return (
     <View style={styles.container}>
-      <Text>History</Text>
+      <Text>Colection</Text>
       <StatusBar style="auto" />
     </View>
   );

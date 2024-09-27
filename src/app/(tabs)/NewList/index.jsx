@@ -1,12 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { router } from 'expo-router';
+import { StyleSheet, Text, View } from 'react-native';
 
-export default function Home() {
+export default function NewList() {
   return (
     <View style={styles.container}>
       <Text>New List</Text>
-      <TouchableOpacity onPress={() => router.navigate("/")} />
       <StatusBar style="auto" />
     </View>
   );
