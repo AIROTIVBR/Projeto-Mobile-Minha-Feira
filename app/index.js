@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Text, View, Button, TouchableOpacity, StatusBar, FlatList, TextInput, StyleSheet, Alert } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -24,6 +24,7 @@ const ScreenContainer = styled.View`
 
 // Cabeçalho superior estilizado
 const Header = styled(SafeAreaView)`
+  flex: 1;
   background-color: #078515;
   padding: 20px;
   border-bottom-left-radius: 20px;
@@ -215,15 +216,15 @@ const Body = styled.View`
 `;
 
 const ListNameInput= styled.TextInput`
-  border-width:2;
+  border-width:2px;
   border-color:#79FC86; 
   border-radius:14px;
   width:90%;
   align-self:center; 
   justify-content:center;
-  padding-left:12;
-  padding-bottom:6; 
-  padding-top: 6; 
+  padding-left:12px;
+  padding-bottom:6px; 
+  padding-top: 6px; 
   font-size:18px; 
   margin-bottom: 10px;
 `;
@@ -339,35 +340,36 @@ function BuyScreen() {
   const { lists } = React.useContext(ListContext);
   const navigation = useNavigation();
 
-  if(lists.length === 0){
-    return Alert.alert('','Você ainda não tem listas!',[
-      {text: "Ok",
-        onPress: () => navigation.navigate('home')
-      }
-    ]);
-  }else{
+  // if(lists.length === 0){
+  //   return Alert.alert('','Você ainda não tem listas!',[
+  //     {text: "Ok",
+  //       onPress: () => navigation.navigate('home')
+  //     }
+  //   ]);
+  // }else{
     return(
-      <View>
-      <Header edges={['top']}>
-        <SubHeaderText>Escolha sua lista!</SubHeaderText>
-        <HeaderText>
-          Sua organização na palma da sua mão
-          <ShoppingIcon name="shopping-cart" size={24} />
-        </HeaderText>
-      </Header>
-      <FlatList
-      data={lists}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
-        <TouchableOpacity onPress={() => navigation.navigate('EditList', { list: item })}>
-          <Feather name="edit" size={24} color="red" />
-          <Text>{item.name}</Text>
-        </TouchableOpacity>
-      )}
-    />
-    </View>
+      <View style={{flex: 1}}>
+        <Header edges={['top']} style={{flex: 1}}>
+          <SubHeaderText>Escolha sua lista!</SubHeaderText>
+          <HeaderText>
+            Sua organização na palma da sua mão
+            <ShoppingIcon name="shopping-cart" size={24} />
+          </HeaderText>
+        </Header>
+        <FlatList 
+          style={{flex: 1, marginTop: 140}}
+          data={lists}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => navigation.navigate('EditList', { list: item })}>
+              <Feather name="edit" size={24} color="red" />
+              <Text>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
     );
-  }
+  // }
 }
 
 
@@ -379,11 +381,6 @@ function CreateScreen({ navigation, route }) {
   const [itemQuantity, setItemQuantity] = useState(1);
   const [items, setItems] = useState([]);
 
-  useEffect(() => {
-    setListName('');
-    setItems([]);
-  }, []);
-
   const handleAddItem = () => {
     if (itemName.trim() !== '') {
       const newItem = { name: itemName, quantity: itemQuantity };
@@ -393,6 +390,7 @@ function CreateScreen({ navigation, route }) {
     } else {
       Alert.alert('','O nome do item não pode estar vazio.');
     }
+    console.log(items)
   };
 
   const handleCancel = () => {
@@ -425,59 +423,65 @@ function CreateScreen({ navigation, route }) {
         value={listName}
         onChangeText={(text) => setListName(text)}
       />
-    </Body>
 
-    <View style={{ flexDirection: 'row', alignItems: 'center', width:"90%",alignSelf:"center", backgroundColor:"black",height:400, padding:28,borderRadius:20}}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf:"flex-start"}}>
-        <QtdButton 
-          title="-" 
-          onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))} 
-          color="#79FC86" // Define fundo transparente
+      <View style={{ flexDirection: 'column', width:"90%",alignSelf:"center", backgroundColor:"black",height:400, padding:28,borderRadius:20 }}>
+        <View style={{flexDirection: 'row', width: "100%"}}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', alignSelf:"flex-start"}}>
+            <QtdButton 
+              title="-" 
+              onPress={() => setItemQuantity(Math.max(1, itemQuantity - 1))} 
+              color="#79FC86" // Define fundo transparente
+            />
+            <Text style={{ marginHorizontal: 8, color:"white" }}>{itemQuantity}</Text>
+            <QtdButton 
+              title="+" 
+              onPress={() => setItemQuantity(itemQuantity + 1)} 
+              color="#79FC86" // Define fundo rede
+            />
+          </View>
+
+          <TextInput 
+            style={{
+              padding: 4,
+              paddingLeft:10,
+              borderColor: "#79FC86",
+              borderWidth: 2,
+              flex: 1,
+              marginHorizontal: 14,
+              borderRadius:14,
+              color: "white",
+              alignSelf:"flex-start"
+            }}
+            placeholder="Nome do Item"
+            value={itemName}
+            onChangeText={(text) => setItemName(text)}
+            placeholderTextColor={"gray"}
+          />
+
+          <TouchableOpacity style={{alignSelf:"flex-start"}} onPress={handleAddItem}><AddIcon name='plus-square'/></TouchableOpacity>
+        </View>
+
+        <FlatList
+          style={{flex: 1, marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: "white"}}
+          data={items}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <View style={{flex: 1, flexDirection: "row", gap: 50}}>
+              <Text style={{color: "white", fontSize: 24 }}>{item.quantity}</Text>
+              <Text style={{color: "white", fontSize: 24}}>{item.name}</Text>
+            </View>
+          )}
         />
-        <Text style={{ marginHorizontal: 8, color:"white" }}>{itemQuantity}</Text>
-        <QtdButton 
-          title="+" 
-          onPress={() => setItemQuantity(itemQuantity + 1)} 
-          color="#79FC86" // Define fundo rede
-        />
+
+
+      
       </View>
 
-      <TextInput 
-        style={{
-          padding: 4,
-          paddingLeft:10,
-          borderColor: "#79FC86",
-          borderWidth: 2,
-          flex: 1,
-          marginHorizontal: 14,
-          borderRadius:14,
-          color: "white",
-          alignSelf:"flex-start"
-        }}
-        placeholder="Nome do Item"
-        value={itemName}
-        onChangeText={(text) => setItemName(text)}
-        placeholderTextColor={"gray"}
-      />
-
-      <TouchableOpacity style={{alignSelf:"flex-start"}} onPress={handleAddItem}><AddIcon name='plus-square'/></TouchableOpacity>
-
-
-      <FlatList
-      data={items}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item }) => (
-        <View>
-          <Text>{item.name} (Qtd: {item.quantity})</Text>
-        </View>
-      )}
-    />
-    </View>
-    
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <Button title="Cancelar" onPress={handleCancel} color="red" />
-      <Button title="Criar" onPress={handleConclude} />
-    </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Button title="Cancelar" onPress={handleCancel} color="red" />
+        <Button title="Criar" onPress={handleConclude} />
+      </View>
+    </Body>
   </View>
   );
 }
