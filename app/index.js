@@ -1,8 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
-  Button,
   TouchableOpacity,
   StatusBar,
   FlatList,
@@ -17,6 +16,7 @@ import styled from "styled-components/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "expo-router";
 import { useFonts, Lexend_400Regular } from "@expo-google-fonts/lexend";
+import Checkbox from "expo-checkbox";
 
 const Tab = createBottomTabNavigator();
 const HomeStack = createStackNavigator();
@@ -518,22 +518,136 @@ function BuyScreen() {
           style={{ flex: 1, marginTop: 140 }}
           data={lists}
           keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <StartFairButton2
-              onPress={() => navigation.navigate("EditList", { list: item })}
-            >
-              <ListNameText>{item.name}</ListNameText>
-              <ChevronIcon2 name="chevron-right" size={24} color="black" />
-            </StartFairButton2>
-          )}
+          renderItem={({ item }) => {
+            console.log("TESSTTEEEE: ", item);
+            return (
+              <StartFairButton2
+                onPress={() =>
+                  navigation.navigate("ToDoScreen", { list: item })
+                }
+              >
+                <ListNameText>{item.name}</ListNameText>
+                <ChevronIcon2 name="chevron-right" size={24} color="black" />
+              </StartFairButton2>
+            );
+          }}
         />
       </View>
     );
   }
 }
 
+// Componente de item da lista de compras (Precisa de um componente a parte para funcionamento do CHECKBOX)
+const ToDoItem = ({ item }) => {
+  const [isChecked, setIsChecked] = useState(false);
+  return (
+    <View style={{ flexDirection: "row", gap: 10 }}>
+      <Checkbox value={isChecked} onValueChange={setIsChecked} />
+      <Text
+        style={{
+          color: "black",
+          fontSize: 24,
+          textDecorationLine: isChecked ? "line-through" : "none",
+        }}
+      >
+        {item.quantity}
+      </Text>
+      <Text
+        style={{
+          color: "black",
+          fontSize: 24,
+          textDecorationLine: isChecked ? "line-through" : "none",
+        }}
+      >
+        {item.name}
+      </Text>
+    </View>
+  );
+};
+
+// Tela de acompanhamento de compras
+function ToDoScreen({ route }) {
+  const { list } = route.params;
+  const navigation = useNavigation();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Header edges={["top"]} style={{ flex: 1 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Feather name="chevron-left" size={48} color="white" />
+        </TouchableOpacity>
+      </Header>
+      <View
+        style={{
+          marginTop: 160,
+          alignItems: "center",
+          justifyContent: "center",
+          height: "60%",
+        }}
+      >
+        <View
+          style={{
+            flexDirection: "row",
+            borderBottomWidth: 1,
+            borderBottomColor: "black",
+            alignItems: "center",
+            justifyContent: "flex-start",
+            marginBottom: 10,
+            gap: 20,
+            paddingHorizontal: 10,
+            width: "80%",
+          }}
+        >
+          <Feather name="shopping-cart" size={32} color="black" />
+          <Text
+            style={{
+              color: "black",
+              fontSize: 32,
+              textAlign: "center",
+              fontFamily: "Lexend_400Regular",
+            }}
+          >
+            {list.name}
+          </Text>
+        </View>
+        <FlatList
+          style={{ flex: 1, width: "100%", paddingHorizontal: 25 }}
+          data={list.items}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => {
+            return <ToDoItem item={item} />;
+          }}
+        />
+      </View>
+      <TouchableOpacity
+        style={{
+          backgroundColor: "green",
+          bottom: 0,
+          width: "50%",
+          height: 50,
+          alignSelf: "center",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 20,
+        }}
+        onPress={() => {
+          if (false) {
+          } else {
+            Alert.alert("", "Compra finalizada com sucesso !");
+            navigation.navigate("home");
+          }
+        }}
+      >
+        <Text style={{ fontSize: 24, fontFamily: "Lexend_400Regular" }}>
+          FEITO
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 // Tela de Criação de Lista (para ambas: Home e Collection)
-function CreateScreen({ navigation, route }) {
+function CreateScreen({ navigation }) {
   const { addList } = React.useContext(ListContext); // Acessa a função addList do contexto
   const [listName, setListName] = useState("");
   const [itemName, setItemName] = useState("");
@@ -670,8 +784,10 @@ function CreateScreen({ navigation, route }) {
         </View>
 
         <View style={styles.buttonsContainer}>
-          <CancelButton onPress={handleCancel}>
-            <CancelButtonText>Cancelar</CancelButtonText>
+          <CancelButton onPress={handleCancel} style={{ borderColor: "black" }}>
+            <CancelButtonText style={{ color: "black" }}>
+              Cancelar
+            </CancelButtonText>
           </CancelButton>
           <CreateButton onPress={handleConclude}>
             <CreateButtonText>Criar</CreateButtonText>
@@ -906,6 +1022,7 @@ function HomeStackScreen() {
       <HomeStack.Screen name="home" component={HomeScreen} />
       <HomeStack.Screen name="CreateFromHome" component={CreateScreen} />
       <HomeStack.Screen name="Buy" component={BuyScreen} />
+      <HomeStack.Screen name="ToDoScreen" component={ToDoScreen} />
     </HomeStack.Navigator>
   );
 }
@@ -961,6 +1078,10 @@ export default function App() {
       })
     );
   };
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <ListContext.Provider
